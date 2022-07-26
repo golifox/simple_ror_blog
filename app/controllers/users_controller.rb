@@ -2,22 +2,19 @@ class UsersController < ApplicationController
   #before_action :set_user
   
   # GET /users
-  def index #works
-    @users = User.all
-        render :json => @users, :include => [:posts=>{:include => (:comments) }]   
+  def index 
+    @users = User.order(:registration_date).page params[:page]
+        render json: @users
   end
 
   # GET /users/1
-  def show #works
-    @user = User.find(params[:id])
-      render :json => @user, :include => 
-        [
-          :posts=>{:include=>(:comments) }
-        ] 
+  def show 
+    set_user
+    @user.as_json(include: {posts : {include: {:comments}}).find_by(params[:id])
   end
 
   # POST /users
-  def create #works
+  def create 
     @user = User.new(user_params)
 
     if @user.save
@@ -29,8 +26,9 @@ class UsersController < ApplicationController
   end
 
   # PATCH/PUT /users/1
-  def update #works
-    set_user  #@user = User.find(params[:id])
+  def update 
+    set_user 
+
     if @user.update(user_params)
       render json: @user
     else
@@ -39,15 +37,12 @@ class UsersController < ApplicationController
   end
 
   # DELETE /users/1
-  def destroy #works
-    set_user  #@user = User.find(params[:id])
-    #@posts = Post.where(user_id: @user.ids[0])
+  def destroy 
+    set_user  
+
     if @user.post_count == 0
       @user.destroy
       render json: { message: "Removing success!"}
-    end
-    if @user.post_count > 0
-      render json: { message: "Remove all user`s posts firstly!!"}
     else
       render json: @user.errors, status: :unprocessable_entity
     end

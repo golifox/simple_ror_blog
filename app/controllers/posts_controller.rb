@@ -1,11 +1,11 @@
 class PostsController < ApplicationController
   # POST /posts
-  def create #works
-    @post = Post.new(post_params) #works
-    get_user #@user = User.find_by(id: @post.user_id) #works
-    #@post = @user.posts.builder(post_params)
+  def create 
+    get_post
+    get_user 
+
     if @post.save
-      @user.update(post_count: @user.posts.size) #works
+      @user.update(post_count: @user.posts.size)
       render json: @post, status: :created, location: @post
     else
       render json: @post.errors, status: :unprocessable_entity
@@ -14,7 +14,7 @@ class PostsController < ApplicationController
 
   # PATCH/PUT /posts/1
   def update #works
-    @post = Post.find((params[:id]))
+    get_post
     if @post.update(post_params)
       render json: @post
     else
@@ -24,12 +24,12 @@ class PostsController < ApplicationController
 
   # DELETE /posts/1
   def destroy #works
-    @post = Post.find((params[:id]))
+    get_post
     get_user
     @users = User.all
     if @post.destroy
       @user.update(post_count: @user.posts.size)
-      render :json => @users, :include => [:posts=>{:include => (:comments) }]
+      render json: { message: "Removing success!" }
     else 
       render json: @post.errors, status: :unprocessable_entity
     end
@@ -40,7 +40,10 @@ class PostsController < ApplicationController
       @user = User.find_by(id: @post.user_id)
     end
 
-    # Only allow a list of trusted parameters through.
+    def get_post
+      @post = Post.find((params[:id]))
+    end
+
     def post_params
       params.permit(:title, :body, :user_id)
     end

@@ -13,11 +13,10 @@ class CommentsController < ApplicationController
 
   # DELETE /comments/1
   def destroy #working
-    @comment = Comment.find((params[:id]))
-    @users = User.all  
+    set_comment
 
     if @comment.destroy
-      render :json => @users, :include => [:posts=>{:include => (:comments) }]
+      render json: { message: "Removing success!" }
     else 
       render json: @post.errors, status: :unprocessable_entity
     end
