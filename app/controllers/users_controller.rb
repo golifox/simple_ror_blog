@@ -10,7 +10,7 @@ class UsersController < ApplicationController
   # GET /users/1
   def show 
     set_user
-    @user.as_json(include: {posts : {include: {:comments}}).find_by(params[:id])
+    @user.as_json(include: posts).find_by(params[:id])
   end
 
   # POST /users
