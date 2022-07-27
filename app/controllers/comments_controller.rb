@@ -1,4 +1,5 @@
 class CommentsController < ApplicationController
+  before_action :set_comment, only: [:destroy]
   
   # POST /comments
   def create #working
@@ -13,8 +14,6 @@ class CommentsController < ApplicationController
 
   # DELETE /comments/1
   def destroy #working
-    set_comment
-
     if @comment.destroy
       render json: { message: "Removing success!" }
     else 

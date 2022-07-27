@@ -1,10 +1,13 @@
 class PostsController < ApplicationController
+  before_action :get_post, except: [:create]
+  before_action :get_user, only: [:destroy]
+
   # POST /posts
   def create 
-    get_post
-    get_user 
+    @post = Post.new(post_params)
 
     if @post.save
+      get_user
       @user.update(post_count: @user.posts.size)
       render json: @post, status: :created, location: @post
     else
@@ -14,7 +17,6 @@ class PostsController < ApplicationController
 
   # PATCH/PUT /posts/1
   def update #works
-    get_post
     if @post.update(post_params)
       render json: @post
     else
@@ -24,9 +26,6 @@ class PostsController < ApplicationController
 
   # DELETE /posts/1
   def destroy #works
-    get_post
-    get_user
-    @users = User.all
     if @post.destroy
       @user.update(post_count: @user.posts.size)
       render json: { message: "Removing success!" }

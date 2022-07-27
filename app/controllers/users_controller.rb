@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
-  #before_action :set_user
-  
+  before_action :set_user, except: [:index, :create] #good string
+
   # GET /users
   def index 
     @users = User.order(:registration_date).page params[:page]
@@ -9,8 +9,7 @@ class UsersController < ApplicationController
 
   # GET /users/1
   def show 
-    set_user
-    @user.as_json(include: posts).find_by(params[:id])
+    render json: @user.as_json(include: {posts: { include: :comments}})
   end
 
   # POST /users
@@ -27,8 +26,6 @@ class UsersController < ApplicationController
 
   # PATCH/PUT /users/1
   def update 
-    set_user 
-
     if @user.update(user_params)
       render json: @user
     else
@@ -38,8 +35,6 @@ class UsersController < ApplicationController
 
   # DELETE /users/1
   def destroy 
-    set_user  
-
     if @user.post_count == 0
       @user.destroy
       render json: { message: "Removing success!"}
